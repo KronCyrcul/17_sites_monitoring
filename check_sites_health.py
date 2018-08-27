@@ -33,7 +33,12 @@ def get_domain_expiration_date(domain_name):
 def print_site_health(url, server_response, time_before_expiration):
     print("Site URL: {}".format(url))
     print("Status code is 200: {}".format(server_response))
-    print("Paid up front for a month: {}".format(time_before_expiration))
+    if time_before_expiration.days > 31:
+        print("Paid up front for a month: Yes,{} days before expire".format(
+            time_before_expiration.days))
+    else:
+        print("Paid up front for a month: No,expired {} days ago".format(
+            time_before_expiration.days*-1))
 
 
 if __name__ == "__main__":
@@ -50,10 +55,4 @@ if __name__ == "__main__":
         domain_name = urlparse(site).hostname
         expiration_date = get_domain_expiration_date(domain_name)
         time_before_expiration = expiration_date - today
-        if time_before_expiration.days > 31:
-            is_payed_up_front = "Yes,{} days before expiration".format(
-                time_before_expiration.days)
-        else:
-            is_payed_up_front = "No,expired {} days ago".format(
-                time_before_expiration.days*-1)
-        print_site_health(site, server_response, is_payed_up_front)
+        print_site_health(site, server_response, time_before_expiration)
