@@ -14,7 +14,7 @@ def load_urls4check(path):
         return None
 
 
-def is_server_respond_with_200(url):
+def is_server_respond_with_ok(url):
     try:
         server_response = requests.get(url)
         return server_response.ok
@@ -36,17 +36,22 @@ def get_domain_expiration_date(domain_name):
 def check_expiration_date(expiration_date, today, days_count):
     try:
         time_before_expiration = expiration_date - today
-        if time_before_expiration.days > days_count:
-            return "Yes, {} before expire".format(time_before_expiration.days)
+        if time_before_expiration.days >= days_count:
+            return True
     except TypeError:
         return False
 
 
-def print_site_health(url, server_response, time_before_expiration):
+def print_site_health(url, server_response, paid_up_front,
+        today, expiration_date):
     print("Site URL: {}".format(url))
     print("Status code is 200: {}".format(server_response))
-    print("Paid up front for a month: {}".format(
-        time_before_expiration))
+    if paid_up_front:
+        print("Paid up front for a month: Yes,{} days before expire".format(
+            (expiration_date-today).days))
+    else:
+        print("Paid up front for a month: {}".format(
+            paid_up_front))
 
 
 if __name__ == "__main__":
@@ -60,10 +65,16 @@ if __name__ == "__main__":
     today = datetime.datetime.today()
     days_count = 31
     for url in urls:
-        server_response = is_server_respond_with_200(url)
+        server_response = is_server_respond_with_ok(url)
         domain_name = urlparse(url).hostname
         expiration_date = get_domain_expiration_date(domain_name)
-        time_before_expiration = check_expiration_date(expiration_date,
-                                                       today,
-                                                       days_count)
-        print_site_health(url, server_response, time_before_expiration)
+        paid_up_front = check_expiration_date(
+            expiration_date,
+            today,
+            days_count)
+        print_site_health(
+            url,
+            server_response,
+            paid_up_front,
+            today,
+            expiration_date)
