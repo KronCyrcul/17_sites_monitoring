@@ -36,8 +36,7 @@ def get_domain_expiration_date(domain_name):
 def check_expiration_date(expiration_date, today, days_count):
     try:
         time_before_expiration = expiration_date - today
-        if time_before_expiration.days >= days_count:
-            return True
+        return time_before_expiration.days >= days_count
     except TypeError:
         return False
 
